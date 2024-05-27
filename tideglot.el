@@ -153,6 +153,7 @@ Argument VALUE is an integer that determines whether to enable or disable modes.
 
 (defun tideglot-eglot-ensure-with-eslint ()
   "Ensure Eglot is running and configure Flymake to use ESLint."
+  (require 'eglot)
   (make-local-variable 'eglot-stay-out-of)
   ;; (add-to-list 'eglot-stay-out-of 'flymake-diagnostic-functions)
   (add-hook 'eglot-managed-mode-hook tideglot-flymake-eslint-backend nil t)
