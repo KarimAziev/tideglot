@@ -71,6 +71,19 @@ syntax checking, and configuring other related modes or hooks."
   :type 'function
   :group 'tideglot)
 
+(defcustom tideglot-after-save-backend-hook nil
+  "Hook run after saving the TypeScript integration backend choice.
+
+A hook that runs after changing and optionally saving the TypeScript
+integration backend.
+
+Functions added to this hook will be executed after the backend is
+changed and the choice is saved. Each function should accept no
+arguments. This can be useful for performing additional setup or
+cleanup tasks related to the backend change."
+  :type 'hook
+  :group 'tideglot)
+
 
 (defcustom tideglot-flymake-eslint-backend 'flymake-eslint-enable
   "Function to enable or disable Flymake ESLint backend.
@@ -210,10 +223,11 @@ Argument NEWVAL is the new value to determine whether to enable Eglot or Tide."
 
 Argument SYMB is the new backend symbol to switch to."
   (interactive (list
-                (let ((options
-                       (copy-tree
-                        (mapcar #'cddr (cdr
-                                        (get 'tideglot-backend 'custom-type))))))
+                (let
+                    ((options
+                      (copy-tree
+                       (mapcar #'cddr (cdr
+                                       (get 'tideglot-backend 'custom-type))))))
                   (cadr (assoc
                          (completing-read
                           (format "Change %s to "
@@ -222,9 +236,11 @@ Argument SYMB is the new backend symbol to switch to."
                           (lambda (it)
                             (not (eq (cadr it) tideglot-backend))))
                          options)))))
-  (if (yes-or-no-p "Save for future?")
-      (customize-save-variable 'tideglot-backend symb)
-    (setq tideglot-backend symb))
+  (if (not (and (not noninteractive)
+                (yes-or-no-p "Save for future?")))
+      (setq tideglot-backend symb)
+    (customize-save-variable 'tideglot-backend symb)
+    (run-hooks 'tideglot-after-save-backend-hook))
   (tideglot-backend-watcher nil symb))
 
 ;; (add-variable-watcher 'tideglot-backend
