@@ -172,7 +172,7 @@ Argument VALUE determines whether to enable or disable Eglot mode."
      (when tideglot-flymake-eslint-backend
        (funcall tideglot-flymake-eslint-backend)))
     (_
-     (when-let ((server
+     (when-let* ((server
                  (when (fboundp 'eglot-current-server)
                    (eglot-current-server))))
        (tideglot-maybe-maybe-set-mode 'flymake-mode -1)
@@ -181,14 +181,14 @@ Argument VALUE determines whether to enable or disable Eglot mode."
 (defun tideglot-enable-eglot-in-js-modes ()
   "Enable Eglot and ESLint in specified JavaScript and TypeScript modes."
   (dolist (mode tideglot-js-modes)
-    (when-let ((hook (intern-soft (concat (symbol-name mode) "-hook"))))
+    (when-let* ((hook (intern-soft (concat (symbol-name mode) "-hook"))))
       (remove-hook hook tideglot-tide-setup-function)
       (add-hook hook #'tideglot-eglot-ensure-with-eslint))))
 
 (defun tideglot-disable-eglot-in-js-modes ()
   "Disable Eglot and enable Tide in JavaScript and TypeScript modes."
   (dolist (mode tideglot-js-modes)
-    (when-let ((hook (intern-soft (concat (symbol-name mode) "-hook"))))
+    (when-let* ((hook (intern-soft (concat (symbol-name mode) "-hook"))))
       (remove-hook hook #'tideglot-eglot-ensure-with-eslint)
       (add-hook hook tideglot-tide-setup-function))))
 
